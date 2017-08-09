@@ -41,10 +41,9 @@ public class NewPostDto {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("PostDTO{");
+        final StringBuilder sb = new StringBuilder("NewPostDto{");
         sb.append("author='").append(author).append('\'');
         sb.append(", title='").append(title).append('\'');
-        sb.append(", text='").append(text).append('\'');
         sb.append('}');
         return sb.toString();
     }

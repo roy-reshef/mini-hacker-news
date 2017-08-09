@@ -72,7 +72,6 @@ public class PostsResourceTest {
         assertEquals(HttpStatus.OK.value(), response.getStatus());
         NewPostResponseDto responseDto = (NewPostResponseDto)result.getAsyncResult();
 
-        //String responseStr = result.getResponse().getContentAsString();
         assertEquals(expecteId, responseDto.getId());
     }
 }

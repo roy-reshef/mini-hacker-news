@@ -10,7 +10,7 @@ public class PostDto {
     public PostDto() {
     }
 
-    public PostDto(String author, String id, String title, String text) {
+    public PostDto(String id, String author, String title, String text) {
         this.author = author;
         this.title = title;
         this.id = id;
@@ -54,7 +54,6 @@ public class PostDto {
         final StringBuilder sb = new StringBuilder("PostDTO{");
         sb.append("id='").append(id).append('\'');
         sb.append(", author='").append(author).append('\'');
-        sb.append(", text='").append(text).append('\'');
         sb.append('}');
         return sb.toString();
     }

@@ -59,7 +59,6 @@ public class Post {
         final StringBuilder sb = new StringBuilder("PostDTO{");
         sb.append("id='").append(id).append('\'');
         sb.append(", author='").append(author).append('\'');
-        sb.append(", text='").append(text).append('\'');
         sb.append('}');
         return sb.toString();
     }

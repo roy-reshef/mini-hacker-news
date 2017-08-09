@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import reshef.minihackernews.api.Application;
 import reshef.minihackernews.api.dtos.NewPostDto;
 import reshef.minihackernews.api.dtos.NewPostResponseDto;
+import reshef.minihackernews.api.dtos.PostDto;
+import reshef.minihackernews.api.dtos.UpdatePostDto;
 import reshef.minihackernews.api.model.Post;
 import reshef.minihackernews.api.services.PostsService;
 
@@ -24,10 +26,12 @@ public class PostsResource {
     private PostsService service;
 
     private Post createPost(NewPostDto newPostDto) {
-        Post p = new Post(newPostDto.getAuthor(),
+        return new Post(newPostDto.getAuthor(),
                 newPostDto.getTitle(), newPostDto.getText());
+    }
 
-        return p;
+    private PostDto toPostDto(Post post) {
+        return new PostDto(post.getId(), post.getAuthor(), post.getTitle(), post.getText());
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
@@ -36,16 +40,15 @@ public class PostsResource {
         return service.getAll();
     }
 
-    /**
-     * path: /minihackernews/{id}
-     *
-     * @param id
-     * @return List<ServiceDTO>
-     */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public Post get(@PathVariable("id") String id) {
+    public Callable<PostDto> get(@PathVariable("id") String id) {
         logger.info("get by id:" + id);
-        return null;
+
+        return () -> {
+            Post post = service.getById(id);
+            Preconditions.checkNotNull(post);
+            return toPostDto(post);
+        };
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -63,8 +66,25 @@ public class PostsResource {
         };
     }
 
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    public Callable<Void> update(@PathVariable("id") String id, @RequestBody UpdatePostDto newPost) throws Exception {
+        logger.info("updating post. id=" + id);
+        Preconditions.checkNotNull(newPost.getText());
+
+        return () -> {
+            Post post = service.getById(id);
+            post.setText(newPost.getText());
+            service.update(post);
+            return null;
+        };
+    }
+
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public void delete(@PathVariable("id") String id) {
+    public Callable<Void> delete(@PathVariable("id") String id) {
         logger.info("delete post by id:" + id);
+        return () -> {
+            service.deleteById(id);
+            return null;
+        };
     }
 }
