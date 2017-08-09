@@ -19,10 +19,13 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import reshef.minihackernews.api.Application;
+import reshef.minihackernews.api.dtos.NewPostResponseDto;
 import reshef.minihackernews.api.model.Post;
 import reshef.minihackernews.api.services.PostsService;
 
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
 @RunWith(SpringRunner.class)
@@ -50,8 +53,9 @@ public class PostsResourceTest {
 
     @Test
     public void testAddPost() throws Exception {
+        String expecteId = "1234";
         Mockito.when(
-                service.add(Mockito.any(Post.class))).thenReturn("1234");
+                service.add(Mockito.any(Post.class))).thenReturn(expecteId);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/minihackernews")
@@ -59,10 +63,16 @@ public class PostsResourceTest {
                 .content(exampleNewPostJson.getBytes())
                 .contentType(MediaType.APPLICATION_JSON);
 
-        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(request().asyncStarted())
+                .andExpect(request().asyncResult(instanceOf(NewPostResponseDto.class)))
+                .andReturn();
+
         MockHttpServletResponse response = result.getResponse();
         assertEquals(HttpStatus.OK.value(), response.getStatus());
-        String responseStr = result.getResponse().getContentAsString();
-        assertEquals(responseStr, "{\"id\":\"1234\"}");
+        NewPostResponseDto responseDto = (NewPostResponseDto)result.getAsyncResult();
+
+        //String responseStr = result.getResponse().getContentAsString();
+        assertEquals(expecteId, responseDto.getId());
     }
 }
