@@ -12,6 +12,7 @@ import reshef.minihackernews.api.model.Post;
 import reshef.minihackernews.api.services.PostsService;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 @RestController
 @RequestMapping("/minihackernews")
@@ -48,16 +49,18 @@ public class PostsResource {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public NewPostResponseDto add(@RequestBody NewPostDto newPost) throws Exception {
+    public Callable<NewPostResponseDto> add(@RequestBody NewPostDto newPost) throws Exception {
         logger.info("adding post:" + newPost.toString());
         Preconditions.checkNotNull(newPost.getAuthor());
         Preconditions.checkNotNull(newPost.getTitle());
         Preconditions.checkNotNull(newPost.getText());
 
-        Post post = createPost(newPost);
-        String id = service.add(post);
+        return () -> {
+            Post post = createPost(newPost);
+            String id = service.add(post);
 
-        return new NewPostResponseDto(id);
+            return new NewPostResponseDto(id);
+        };
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
