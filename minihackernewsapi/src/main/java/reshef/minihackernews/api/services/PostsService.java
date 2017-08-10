@@ -18,6 +18,9 @@ public class PostsService {
     @Autowired
     private PostsRepository repository;
 
+    @Autowired
+    private PostsStatisticsService statisticsService;
+
     public List<Post> getAll() {
         return repository.findAll();
     }
@@ -40,9 +43,11 @@ public class PostsService {
 
     public void deleteById(String id) {
         repository.delete(id);
+        statisticsService.reload();
     }
 
     public void deleteAll() {
         repository.deleteAll();
+        statisticsService.reload();
     }
 }

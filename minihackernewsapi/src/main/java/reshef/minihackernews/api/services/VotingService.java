@@ -23,6 +23,9 @@ public class VotingService {
     private PostsService postsService;
 
     @Autowired
+    private PostsStatisticsService statisticsService;
+
+    @Autowired
     private UsersRepository usersRepository;
 
     private ExecutorService executorService;
@@ -81,6 +84,8 @@ public class VotingService {
 
                     postsService.update(post);
                     usersRepository.save(user);
+
+                    statisticsService.updateList(post);
                 } else {
                     logger.info("User has already voted for this post");
                 }

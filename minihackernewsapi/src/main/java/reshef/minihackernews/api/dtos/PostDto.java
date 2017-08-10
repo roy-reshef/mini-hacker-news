@@ -74,6 +74,22 @@ public class PostDto {
         this.downvotes = downvotes;
     }
 
+    public long getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(long creationTime) {
+        this.creationTime = creationTime;
+    }
+
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("PostDto{");
