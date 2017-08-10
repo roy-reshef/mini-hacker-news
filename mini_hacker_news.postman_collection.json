@@ -1,0 +1,126 @@
+{
+	"variables": [],
+	"info": {
+		"name": "mini_hacker_news",
+		"_postman_id": "d8f42eae-e36a-7934-33ac-fab80a69821b",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "get all",
+			"request": {
+				"url": "http://localhost:8080/minihackernews",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "get by id",
+			"request": {
+				"url": "http://localhost:8080/minihackernews/1",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "add",
+			"request": {
+				"url": "http://localhost:8080/minihackernews",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"author\":\"roy reshef\",\n    \"title\":\"title\",\n    \"text\":\"lalala\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "delete by id",
+			"request": {
+				"url": "http://localhost:8080/minihackernews/1",
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "update",
+			"request": {
+				"url": "http://localhost:8080/minihackernews/{id}",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"text\":\"lalala111\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "vote",
+			"request": {
+				"url": "http://localhost:8080/minihackernews/ef2b478b-1c86-42c7-8122-a549b454a8b9",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"up\":true,\n    \"voter\":\"yossi\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "delete all",
+			"request": {
+				"url": "http://localhost:8080/minihackernews",
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "get hot posts",
+			"request": {
+				"url": "http://localhost:8080/minihackernews/hot",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
