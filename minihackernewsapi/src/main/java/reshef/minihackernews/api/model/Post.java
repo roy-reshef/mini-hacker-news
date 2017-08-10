@@ -8,11 +8,13 @@ public class Post {
 
     @Id
     private String id;
+    private long creationTime;
     private String author;
     private String title;
     private String text;
     private int upvotes = 0;
     private int downvotes = 0;
+    private double rating = 0;
 
     public Post() {
     }
@@ -23,6 +25,7 @@ public class Post {
 
     public Post(String id, String author, String title, String text) {
         this.id = id;
+        this.creationTime = System.currentTimeMillis();
         this.author = author;
         this.title = title;
         this.text = text;
@@ -76,12 +79,28 @@ public class Post {
         this.downvotes = downvotes;
     }
 
+    public double getRating() {
+        return rating;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
     public synchronized void upVote() {
         upvotes++;
     }
 
     public synchronized void downVote() {
         downvotes++;
+    }
+
+    public long getCreationTime() {
+        return creationTime;
+    }
+
+    public void setCreationTime(long creationTime) {
+        this.creationTime = creationTime;
     }
 
     @Override

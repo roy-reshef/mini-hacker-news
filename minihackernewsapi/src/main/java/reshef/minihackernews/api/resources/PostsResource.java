@@ -9,10 +9,12 @@ import reshef.minihackernews.api.Application;
 import reshef.minihackernews.api.dtos.*;
 import reshef.minihackernews.api.model.Post;
 import reshef.minihackernews.api.services.PostsService;
+import reshef.minihackernews.api.services.PostsStatisticsService;
 import reshef.minihackernews.api.services.VotingService;
 
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/minihackernews")
@@ -24,6 +26,9 @@ public class PostsResource {
     private PostsService postsService;
 
     @Autowired
+    private PostsStatisticsService statisticsService;
+
+    @Autowired
     private VotingService votingService;
 
     private Post createPost(NewPostDto newPostDto) {
@@ -33,13 +38,23 @@ public class PostsResource {
 
     private PostDto toPostDto(Post post) {
         return new PostDto(post.getId(), post.getAuthor(), post.getTitle(), post.getText(),
-                post.getUpvotes(), post.getDownvotes());
+                post.getUpvotes(), post.getDownvotes(), post.getCreationTime(), post.getRating());
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    private List<PostDto> toPostDtos(List<Post> posts) {
+        return posts.parallelStream().map(post -> toPostDto(post)).collect(Collectors.toList());
+    }
+
+    @RequestMapping(method = RequestMethod.GET)
     public List<Post> getAll() {
         logger.info("get all posts");
         return postsService.getAll();
+    }
+
+    @RequestMapping(method = RequestMethod.DELETE)
+    public void deleteAll() {
+        logger.info("deleting all posts");
+        postsService.deleteAll();
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -50,6 +65,16 @@ public class PostsResource {
             Post post = postsService.getById(id);
             Preconditions.checkNotNull(post);
             return toPostDto(post);
+        };
+    }
+
+    @RequestMapping(value = "/hot", method = RequestMethod.GET)
+    public Callable<List<PostDto>> getHotPosts() {
+        logger.info("get hot posts");
+
+        return () -> {
+            List<Post> posts = statisticsService.getTopPosts();
+            return toPostDtos(posts);
         };
     }
 

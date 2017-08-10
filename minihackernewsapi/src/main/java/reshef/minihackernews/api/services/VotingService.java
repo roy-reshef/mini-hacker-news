@@ -8,6 +8,7 @@ import reshef.minihackernews.api.dtos.PostVoteDto;
 import reshef.minihackernews.api.model.Post;
 import reshef.minihackernews.api.model.User;
 import reshef.minihackernews.api.repositories.UsersRepository;
+import reshef.minihackernews.api.utils.RatingCalculator;
 
 import javax.annotation.PostConstruct;
 import java.util.concurrent.ExecutorService;
@@ -75,6 +76,9 @@ public class VotingService {
                         logger.info("updating down votes for post:" + postId);
                         post.downVote();
                     }
+
+                    post.setRating(RatingCalculator.rate(post));
+
                     postsService.update(post);
                     usersRepository.save(user);
                 } else {

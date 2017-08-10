@@ -25,8 +25,7 @@ public class Application implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
-        // todo: base on profiles
-        service.deleteAll();
+        //service.deleteAll();
     }
 
     public static void main(String[] args) {

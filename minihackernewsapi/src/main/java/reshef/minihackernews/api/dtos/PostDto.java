@@ -8,17 +8,22 @@ public class PostDto {
     private String text;
     private int upvotes;
     private int downvotes;
+    private long creationTime;
+    double rating;
 
     public PostDto() {
     }
 
-    public PostDto(String id, String author, String title, String text, int upvotes, int downvotes) {
+    public PostDto(String id, String author, String title, String text,
+                   int upvotes, int downvotes, long creationTime, double rating) {
         this.author = author;
         this.title = title;
         this.id = id;
         this.text = text;
         this.upvotes = upvotes;
         this.downvotes = downvotes;
+        this.creationTime = creationTime;
+        this.rating = rating;
     }
 
     public String getId() {
