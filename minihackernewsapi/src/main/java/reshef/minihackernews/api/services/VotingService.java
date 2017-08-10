@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reshef.minihackernews.api.dtos.PostVoteDto;
 import reshef.minihackernews.api.model.Post;
+import reshef.minihackernews.api.model.User;
+import reshef.minihackernews.api.repositories.UsersRepository;
 
 import javax.annotation.PostConstruct;
 import java.util.concurrent.ExecutorService;
@@ -18,6 +20,9 @@ public class VotingService {
 
     @Autowired
     private PostsService postsService;
+
+    @Autowired
+    private UsersRepository usersRepository;
 
     private ExecutorService executorService;
 
@@ -46,15 +51,35 @@ public class VotingService {
             Post post = postsService.getById(postId);
 
             if (post != null) {
-                if (postVoteDto.isUp()) {
-                    logger.info("updating up votes for post:" + postId);
-                    post.upVote();
+                boolean shouldUpdate = true;
+
+                User user = usersRepository.findOne(postVoteDto.getVoter());
+                // normally a user will be created on registration
+                if (user == null) {
+                    logger.info("user does not exist. creating");
+                    user = new User(postVoteDto.getVoter());
+                    user.addVote(postId);
                 } else {
-                    logger.info("updating down votes for post:" + postId);
-                    post.downVote();
+                    if (user.hasVotedFor(postId)) {
+                        shouldUpdate = false;
+                    } else {
+                        user.addVote(postId);
+                    }
                 }
 
-                postsService.update(post);
+                if (shouldUpdate) {
+                    if (postVoteDto.isUp()) {
+                        logger.info("updating up votes for post:" + postId);
+                        post.upVote();
+                    } else {
+                        logger.info("updating down votes for post:" + postId);
+                        post.downVote();
+                    }
+                    postsService.update(post);
+                    usersRepository.save(user);
+                } else {
+                    logger.info("User has already voted for this post");
+                }
             } else {
                 logger.error("post with id '" + postId + "' was not found");
             }
