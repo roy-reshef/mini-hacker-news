@@ -6,12 +6,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reshef.minihackernews.api.Application;
-import reshef.minihackernews.api.dtos.NewPostDto;
-import reshef.minihackernews.api.dtos.NewPostResponseDto;
-import reshef.minihackernews.api.dtos.PostDto;
-import reshef.minihackernews.api.dtos.UpdatePostDto;
+import reshef.minihackernews.api.dtos.*;
 import reshef.minihackernews.api.model.Post;
 import reshef.minihackernews.api.services.PostsService;
+import reshef.minihackernews.api.services.VotingService;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -23,7 +21,10 @@ public class PostsResource {
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
     @Autowired
-    private PostsService service;
+    private PostsService postsService;
+
+    @Autowired
+    private VotingService votingService;
 
     private Post createPost(NewPostDto newPostDto) {
         return new Post(newPostDto.getAuthor(),
@@ -31,13 +32,14 @@ public class PostsResource {
     }
 
     private PostDto toPostDto(Post post) {
-        return new PostDto(post.getId(), post.getAuthor(), post.getTitle(), post.getText());
+        return new PostDto(post.getId(), post.getAuthor(), post.getTitle(), post.getText(),
+                post.getUpvotes(), post.getDownvotes());
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public List<Post> getAll() {
         logger.info("get all posts");
-        return service.getAll();
+        return postsService.getAll();
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -45,9 +47,20 @@ public class PostsResource {
         logger.info("get by id:" + id);
 
         return () -> {
-            Post post = service.getById(id);
+            Post post = postsService.getById(id);
             Preconditions.checkNotNull(post);
             return toPostDto(post);
+        };
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.POST)
+    public Callable<Void> vote(@PathVariable("id") String id, @RequestBody PostVoteDto voteDto) {
+        Preconditions.checkNotNull(voteDto.getVoter());
+        logger.info("vote for post:" + id);
+
+        return () -> {
+            votingService.updateVotes(id, voteDto);
+            return null;
         };
     }
 
@@ -60,7 +73,7 @@ public class PostsResource {
 
         return () -> {
             Post post = createPost(newPost);
-            String id = service.add(post);
+            String id = postsService.add(post);
 
             return new NewPostResponseDto(id);
         };
@@ -72,9 +85,9 @@ public class PostsResource {
         Preconditions.checkNotNull(newPost.getText());
 
         return () -> {
-            Post post = service.getById(id);
+            Post post = postsService.getById(id);
             post.setText(newPost.getText());
-            service.update(post);
+            postsService.update(post);
             return null;
         };
     }
@@ -83,7 +96,7 @@ public class PostsResource {
     public Callable<Void> delete(@PathVariable("id") String id) {
         logger.info("delete post by id:" + id);
         return () -> {
-            service.deleteById(id);
+            postsService.deleteById(id);
             return null;
         };
     }

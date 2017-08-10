@@ -20,8 +20,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import reshef.minihackernews.api.Application;
 import reshef.minihackernews.api.dtos.NewPostResponseDto;
+import reshef.minihackernews.api.dtos.PostDto;
 import reshef.minihackernews.api.model.Post;
 import reshef.minihackernews.api.services.PostsService;
+import reshef.minihackernews.api.services.VotingService;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -36,7 +38,13 @@ public class PostsResourceTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private PostsService service;
+    private PostsService postsService;
+
+    @MockBean
+    private VotingService votingService;
+
+    private String postUnderTestId = "1234";
+    private Post underTest;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -49,13 +57,12 @@ public class PostsResourceTest {
     @Before
     public void setup() throws Exception {
         mockMvc = webAppContextSetup(webApplicationContext).build();
+        underTest = new Post(postUnderTestId, "roy", "test post", "this is the test content");
     }
 
     @Test
     public void testAddPost() throws Exception {
-        String expecteId = "1234";
-        Mockito.when(
-                service.add(Mockito.any(Post.class))).thenReturn(expecteId);
+        Mockito.when(postsService.add(Mockito.any(Post.class))).thenReturn(postUnderTestId);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/minihackernews")
@@ -70,8 +77,28 @@ public class PostsResourceTest {
 
         MockHttpServletResponse response = result.getResponse();
         assertEquals(HttpStatus.OK.value(), response.getStatus());
-        NewPostResponseDto responseDto = (NewPostResponseDto)result.getAsyncResult();
+        NewPostResponseDto responseDto = (NewPostResponseDto) result.getAsyncResult();
 
-        assertEquals(expecteId, responseDto.getId());
+        assertEquals(postUnderTestId, responseDto.getId());
+    }
+
+    @Test
+    public void testGetPost() throws Exception {
+        Mockito.when(postsService.getById(Mockito.any(String.class))).thenReturn(underTest);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get("/minihackernews/" + postUnderTestId)
+                .accept(MediaType.APPLICATION_JSON);
+
+        MvcResult result = mockMvc.perform(requestBuilder)
+                .andExpect(request().asyncStarted())
+                .andExpect(request().asyncResult(instanceOf(PostDto.class)))
+                .andReturn();
+
+        MockHttpServletResponse response = result.getResponse();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        PostDto responseDto = (PostDto) result.getAsyncResult();
+
+        assertEquals(postUnderTestId, responseDto.getId());
     }
 }
